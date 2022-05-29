@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STAR WARS</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&family=Roboto:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/694px-Star_Wars_Logo.svg.png"
+      type="image/x-icon"
+    />
+
+    <style>
+      * {
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnvO2jXQ7aSLSTydGRozWo-qfrFePVFY4y2NJwMxSrNDtbNfPGIkEQFvxcwcJE1hFQfek&usqp=CAU);
+      }
+
+      #logo_search_bar {
+        width: 540px;
+        margin: auto;
+        margin-top: 130px;
+      }
+
+      #logo > img {
+        height: 200px;
+        margin-bottom: 10px;
+      }
+
+      #logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #search_bar {
+        display: flex;
+        box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+          rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+          rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+        border-radius: 15px;
+        width: 510px;
+        height: 30px;
+        padding: 10px;
+        background-color: #2d2f30;
+      }
+
+      #id_input {
+        border: none;
+        width: 500px;
+        background-color: #2d2f30;
+        border-radius: 5px;
+        padding-left: 5px;
+        color: white;
+      }
+
+      .material-symbols-outlined {
+        color: yellow;
+        height: 40px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
+      #container {
+        height: 250px;
+        width: 480px;
+        overflow: scroll;
+        overflow-x: hidden;
+        background-color: #2d2f30;
+        border-radius: 10px;
+        margin: auto;
+        margin-top: 5px;
+        padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: auto;
+        gap: 20px;
+        display: none;
+      }
+
+      #box {
+        padding: 10px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      #box:hover {
+        color: yellow;
+      }
+
+      #error {
+        color: white;
+        padding: 10px;
+        width: 250px;
+        margin: auto;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="logo_search_bar">
+      <div id="logo">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/694px-Star_Wars_Logo.svg.png"
+          alt=""
+        />
+      </div>
+
+      <div id="search_bar">
+        <input id="id_input" type="text" placeholder="Search characters" />
+        <span class="material-symbols-outlined"> search </span>
+      </div>
+    </div>
+
+    <div id="container"></div>
+
+    <div id="error">No results found. Try again...</div>
+  </body>
+</html>
+
+<script>
+  var id;
+
+  var container = document.querySelector("#container");
+
+  document
+    .querySelector("#id_input")
+    .addEventListener("input", function_search);
+
+  function function_search() {
+    var query = document.querySelector("#id_input").value;
+
+    console.log(query);
+
+    function_query(query);
+  }
+
+  function function_query(query) {
+    var url = `https://swapi.dev/api/people/?search=${query}`;
+
+    async function search_char() {
+      try {
+        var data = await fetch(url);
+
+        var response = await data.json();
+
+        console.log(response.results);
+
+        display_data(response.results);
+
+        if (response.results.length != 0) {
+          document.querySelector("#container").style.display = "block";
+          document.querySelector("#error").style.display = "none";
+        } else {
+          document.querySelector("#container").style.display = "none";
+          document.querySelector("#error").style.display = "block";
+        }
+
+        if (query == "") {
+          document.querySelector("#container").style.display = "none";
+          document.querySelector("#error").style.display = "none";
+        }
+      } catch (error) {
+        console.log("No results found. Try again...");
+        document.querySelector("#error").style.display = "block";
+      }
+    }
+
+    Debounce(search_char, 1000);
+
+    /*search_char();*/
+  }
+
+  function display_data(data) {
+    document.querySelector("#container").innerHTML = null;
+
+    data.forEach(function (el) {
+      var box = document.createElement("div");
+      box.setAttribute("id", "box");
+      document.querySelector("#container").append(box);
+
+      var name = document.createElement("h4");
+      name.innerText = el.name;
+
+      var gender = document.createElement("p");
+      gender.innerText = el.gender;
+
+      box.append(name, gender);
+    });
+  }
+
+  function Debounce(func, delay) {
+    if (id) {
+      clearTimeout(id);
+    }
+
+    id = setTimeout(function () {
+      func();
+    }, delay);
+  }
+</script>
